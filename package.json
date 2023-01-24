@@ -1,0 +1,24 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "SQL Challenge: Employee Tracker",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karinnesagir/Employee-Tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/karinnesagir/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/karinnesagir/Employee-Tracker#readme",
+  "dependencies": {
+    "inquirer": "^8.2.4"
+  }
+}
