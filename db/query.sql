@@ -1,0 +1,5 @@
+-- SELECT departments.department_name AS department, roles.job_title
+-- FROM roles
+-- LEFT JOIN departments
+-- ON roles.departments_id = departments_id
+-- ORDER BY departments.department_name;
