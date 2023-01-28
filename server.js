@@ -36,11 +36,10 @@ const promptUser = () => {
             'Add a Role',
             'Add an Employee',
             'Update an Employee Role',
-        
+            'Remove a Department',
             ]
         }
       ])
-
       .then(answers => {
         const {options} = answers;
         // console.log(options);
@@ -57,16 +56,40 @@ const promptUser = () => {
           addADepartment()
         }    
         if(options == 'Add a Role'){
-          assARole()
+          addARole()
         }    
         if(options == 'Add an Employee'){
           addAnEmployee()
         }    
         if(options == 'Update an Employee Role'){
           updateAnEmployeeRole()
+        } 
+        if(options == 'Remove a Department'){
+          removeDepartment()
         }   
       })
   };
 
 promptUser()
+
+const viewAllDepartments = () => {
+  connection.query('SELECT * FROM department', function (err, results) {
+    console.table(results)
+    promptUser();
+  })
+};
+
+const viewAllRoles = () => {
+  connection.query('SELECT * FROM role', function (err, results) {
+    console.table(results)
+    promptUser();
+  })
+}
+
+const viewAnEmployee = () => {
+  connection.query('SELECT * FROM employee', function (err, results) {
+    console.table(results)
+    promptUser();
+  })
+}
 
