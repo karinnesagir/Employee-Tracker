@@ -6,7 +6,6 @@ const mysql = require('mysql2')
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-
 // Express middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -20,7 +19,6 @@ const connection = mysql.createConnection(
     database: 'employees_db'
   },
 );
-
 
 // Prompt user
 const promptUser = () => {
@@ -72,6 +70,7 @@ const promptUser = () => {
 
 promptUser()
 
+// View all Departments 
 const viewAllDepartments = () => {
   connection.query('SELECT * FROM department', function (err, results) {
     console.table(cTable.getTable(results))
@@ -79,6 +78,7 @@ const viewAllDepartments = () => {
   })
 };
 
+// View all Roles 
 const viewAllRoles = () => {
   connection.query(`SELECT role.id, role.title, role.salary, 
   department.department_name AS department FROM role INNER JOIN department ON role.department_id = department.id`, 
@@ -88,6 +88,7 @@ const viewAllRoles = () => {
   })
 }
 
+// View all Employees 
 const viewAllEmployees = () => {
   connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name, role.salary, 
   CONCAT(manager.first_name, ' ', manager.last_name) AS manager_name FROM employee 
@@ -100,6 +101,7 @@ const viewAllEmployees = () => {
   });
 }
 
+// Add a Department 
 const addADepartment = () => {
   inquirer.prompt([
     {
@@ -117,6 +119,7 @@ const addADepartment = () => {
   });
 };
 
+// Add a Role 
 const addARole = () => {
   const sql = 'SELECT * FROM department'
   connection.query(sql, (error, response) => {
@@ -159,6 +162,7 @@ const addARole = () => {
   });
 };
 
+// Add an Employee 
 const addAnEmployee = () => {
   inquirer.prompt([
     {
@@ -217,6 +221,7 @@ const addAnEmployee = () => {
   });
 };
 
+// Update an Employee Role
 const updateAnEmployeeRole = () => {
   connection.query("SELECT * FROM employee", (error, response) => {
       if (error) throw error;
