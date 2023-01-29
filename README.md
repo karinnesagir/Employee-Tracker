@@ -69,20 +69,20 @@ node index.js
 
 ## Usage
 
-<!-- Here is a [Link](https://drive.google.com/file/d/1oqKl-pTpF4ZAREKSltsWYZbrsQa_3zW-/view) to a walkthrough video that demonstrates the functionality of the application. -->
+Here is a [Link](https://drive.google.com/file/d/1J98GbnfviYuA_mH7z8nOgGvGrsD6c4Bs/view?usp=sharing) to a walkthrough video that demonstrates the functionality of the application.
 
 Example of prompt:
 
-<!-- ![Jest test](./assets/prompt.jpg) -->
+![View options](./assets/image_1.jpg)
+![Add Role option](./assets/image_2.jpg)
 
 ## Features
 
 1. JavaScript
 2. Node.js
-3. Bootstrap
+3. MYSQL
 4. Inquirer
-5. Jest
-6. Object-Oriented Programming
+5. Express.js
 
 ## License
 
