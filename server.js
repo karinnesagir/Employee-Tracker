@@ -1,5 +1,6 @@
 const inquirer = require('inquirer'); 
 const express = require('express')
+const cTable = require('console.table');
 const mysql = require('mysql2')
 
 const PORT = process.env.PORT || 3001;
@@ -18,7 +19,6 @@ const connection = mysql.createConnection(
     password: 'myPassword',
     database: 'employees_db'
   },
-  console.log(`Connected to the employees_db database.`),
 );
 
 
@@ -28,7 +28,7 @@ const promptUser = () => {
         {
           name: 'options',
           type: 'list',
-          message: 'Please select an option:',
+          message: 'What would you like to do?',
           choices: [
             'View all Departments',
             'View all Roles',
@@ -37,7 +37,6 @@ const promptUser = () => {
             'Add a Role',
             'Add an Employee',
             'Update an Employee Role',
-            'Remove a Department',
             ]
         }
       ])
@@ -75,7 +74,7 @@ promptUser()
 
 const viewAllDepartments = () => {
   connection.query('SELECT * FROM department', function (err, results) {
-    console.table(results)
+    console.table(cTable.getTable(results))
     promptUser();
   })
 };
@@ -84,23 +83,21 @@ const viewAllRoles = () => {
   connection.query(`SELECT role.id, role.title, role.salary, 
   department.department_name AS department FROM role INNER JOIN department ON role.department_id = department.id`, 
   function (err, results) {
-    console.table(results)
+    console.table(cTable.getTable(results))
     promptUser();
   })
 }
 
-// add view manager
 const viewAllEmployees = () => {
-  connection.query(
-  `SELECT employee.id, employee.first_name, employee.last_name,
-  role.title, 
-  department.department_name AS department, 
-  role.salary FROM employee, 
-  role, department WHERE department.id = role.department_id AND role.id = employee.role_id ORDER BY employee.id`,
+  connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name, role.salary, 
+  CONCAT(manager.first_name, ' ', manager.last_name) AS manager_name FROM employee 
+  JOIN role ON role.id = employee.role_id
+  JOIN department ON department.id = role.department_id
+  LEFT JOIN employee as manager ON employee.manager_id = manager.role_id`,
   function (err, results) {
-    console.table(results)
+    console.table(cTable.getTable(results))
     promptUser();
-  })
+  });
 }
 
 const addADepartment = () => {
@@ -162,42 +159,25 @@ const addARole = () => {
   });
 };
 
-// Add a New Employee
 const addAnEmployee = () => {
   inquirer.prompt([
     {
       type: 'input',
       name: 'fistName',
       message: "What is the employee's first name?",
-      validate: addFirstName => {
-        if (addFirstName) {
-            return true;
-        } else {
-            console.log('Please enter a first name');
-            return false;
-        }
-      }
     },
     {
       type: 'input',
       name: 'lastName',
       message: "What is the employee's last name?",
-      validate: addLastName => {
-        if (addLastName) {
-            return true;
-        } else {
-            console.log('Please enter a last name');
-            return false;
-        }
-      }
     }
   ])
     .then(answer => {
-    const crit = [answer.fistName, answer.lastName]
+    const employeeFullName = [answer.fistName, answer.lastName]
     const roleSql = `SELECT role.id, role.title FROM role`;
-    connection.query(roleSql, (error, data) => {
+    connection.query(roleSql, (error, response) => {
       if (error) throw error; 
-      const roles = data.map(({ id, title }) => ({ name: title, value: id }));
+      const roles = response.map(({ id, title }) => ({ name: title, value: id }));
       inquirer.prompt([
             {
               type: 'list',
@@ -208,11 +188,11 @@ const addAnEmployee = () => {
           ])
             .then(roleChoice => {
               const role = roleChoice.role;
-              crit.push(role);
+              employeeFullName.push(role);
               const managerSql =  `SELECT * FROM employee`;
-              connection.query(managerSql, (error, data) => {
+              connection.query(managerSql, (error, response) => {
                 if (error) throw error;
-                const managers = data.map(({ id, first_name, last_name }) => ({ name: first_name + " "+ last_name, value: id }));
+                const managers = response.map(({ id, first_name, last_name }) => ({ name: first_name + " "+ last_name, value: id }));
                 inquirer.prompt([
                   {
                     type: 'list',
@@ -221,15 +201,13 @@ const addAnEmployee = () => {
                     choices: managers
                   }
                 ])
-                  .then(managerChoice => {
-                    const manager = managerChoice.manager;
-                    crit.push(manager);
+                  .then(managerAnswer => {
+                    const manager = managerAnswer.manager;
+                    employeeFullName.push(manager);
                     // add manager column (first in viewAllEmployees)
-                    const sql =   `INSERT INTO employee (first_name, last_name, role_id)
-                                  VALUES (?, ?, ?)`;
-                    connection.query(sql, crit, (error) => {
+                    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
+                    connection.query(sql, employeeFullName, (error) => {
                     if (error) throw error;
-                    console.log("Employee has been added!")
                     viewAllEmployees();
               });
             });
@@ -238,3 +216,41 @@ const addAnEmployee = () => {
      });
   });
 };
+
+const updateAnEmployeeRole = () => {
+  connection.query("SELECT * FROM employee", (error, response) => {
+      if (error) throw error;
+      const roles = response.map(response => response.id + " " + response.first_name + " " + response.last_name)
+      inquirer.prompt([
+          {
+              type: "list",
+              message: "Which employees would you like to update?",
+              name: "employeeToUpdate",
+              choices: roles
+          }
+      ]).then(employee => {
+          let employeeId = employee.employeeToUpdate.split(' ')[0];
+          connection.query("SELECT * FROM role", (error, response) => {
+              if (error) throw error;
+              const employees = response.map(response => response.id + " " + response.title)
+              inquirer.prompt([
+                  {
+                      type: "list",
+                      message: "What is this employee's new role?",
+                      name: "newrole",
+                      choices: employees
+                  }
+              ]).then(newrole => {
+                  let roleId = newrole.newrole.split(' ')[0];
+                  let query = connection.query("UPDATE employee SET role_id = ? WHERE id = ?",
+                      [roleId, employeeId],
+                      (error, response) => {
+                          if (error) throw error;
+                      }
+                  );
+                  viewAllEmployees();
+              });
+          });
+      });
+  });
+}
