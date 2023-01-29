@@ -208,7 +208,6 @@ const addAnEmployee = () => {
                   .then(managerAnswer => {
                     const manager = managerAnswer.manager;
                     employeeFullName.push(manager);
-                    // add manager column (first in viewAllEmployees)
                     const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
                     connection.query(sql, employeeFullName, (error) => {
                     if (error) throw error;

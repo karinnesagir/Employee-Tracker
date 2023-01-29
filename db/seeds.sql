@@ -1,20 +1,21 @@
 INSERT INTO department (department_name)
-VALUES ('Management'),
+VALUES ('Marketing'),
        ('Finance'),
        ('Sales'),
-       ('Engineering'),
-       ('Human Resources');
+       ('Engineering');
 
 INSERT INTO role (title, salary, department_id)
-VALUES ('Manager', 130000, 01),
-       ('Accountant', 105000, 02),
-       ('Business Analyst', 95000, 03),
-       ('Engineer', 120000, 04),
-       ('HR coordinator', 90000, 05);
+VALUES ('Office Manager', 130000, 3),
+       ('Marketing agent', 100000, 1),
+       ('Accountant', 105000, 2),
+       ('Business Analyst', 95000, 3),
+       ('Product Manager', 150000, 4),
+       ('Engineer', 130000, 4);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Joe', 'Brott', 1, null),
        ('Justin', 'Frumman', 2, 1),
        ('Lauren', 'Montosae', 3, 1),
-       ('Kayleen', 'Sagonde', 4, 1),
-       ('Roni', 'Jole', 5, 1);
+       ('Eliotte', 'Kaz', 4, 1),
+       ('Roni', 'Jole', 5, null),
+       ('Kayleen', 'Sagonde', 6, 5);
